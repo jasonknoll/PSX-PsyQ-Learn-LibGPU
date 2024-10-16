@@ -1,6 +1,28 @@
+/*
+    Learning the PSX GPU Library
+    main.c
+    Jason Knoll
+
+    Based on the cube example project from PCSX-Redux
+*/
+
+
+/ Callback functions
 #include <libetc.h>
+
+// Graphics 
 #include <libgpu.h>
+
+// Geometry
 #include <libgte.h>
+
+// Allows me to set the ram and stack size
+#include <libsn.h>
+
+// Controller
+#include <libpad.h>
+
+// Standard C library
 #include <stdlib.h>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(*(a)))
@@ -8,6 +30,10 @@
 #define OTSIZE 4096
 #define SCREEN_Z 512
 #define CUBESIZE 196
+
+// Set RAM and Stack sizes to 2MB and 16KB respectivley
+unsigned long __ramsize = 0x00200000;
+unsigned long __stacksize = 0x00004000;
 
 typedef struct DB {
     DRAWENV draw;
@@ -109,8 +135,7 @@ int main(void) {
 
         FntPrint("Code compiled using Psy-Q libraries\n\n");
         FntPrint("converted by psyq-obj-parser\n\n");
-        FntPrint("PCSX-Redux project\n\n");
-        FntPrint("https://bit.ly/pcsx-redux");
+        FntPrint("Trying to print out different shapes\n\n");
 
         add_cube(cdb->ot, cdb->s, &transform);
 
