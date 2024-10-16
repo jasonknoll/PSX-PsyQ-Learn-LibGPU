@@ -159,9 +159,12 @@ int main(void) {
     init_cube(&db[0], col);
     init_cube(&db[1], col);
 
+    triangle_color.r = rand();
+    triangle_color.g = rand();
+    triangle_color.b = rand();
 
-    init_line(&db[0], &col[0]);
-    init_line(&db[1], &col[0]);
+    init_line(&db[0], &triangle_color);
+    init_line(&db[1], &triangle_color);
 
     // Draw display mask*
     SetDispMask(1);
