@@ -7,5 +7,5 @@ PSX.Dev-README.md
 *.o
 *.a
 *.iso
+*.dat
 third_party/psyq
-license_data.dat
