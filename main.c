@@ -28,7 +28,7 @@
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(*(a)))
 
-#define SCREEWIDTH 640
+#define SCREENWIDTH 640
 #define SCREENHEIGHT 480
 
 #define OTSIZE 4096
@@ -48,7 +48,7 @@ typedef struct DB {
     // NOTE How do I just use a pointer like the docs say? (ordtbl.pdf section 1.3)
     //u_long *ot_2d; 
     POLY_F4 s[6]; // 6 squares to make a cube
-    POLY_F3 s_triangle; // TODO draw a triangle
+    POLY_F3 s_triangle; // TODO make the triangle rotate
     LINE_F2 test_line; 
 } DB;
 
@@ -62,10 +62,6 @@ static SVECTOR cube_vertices[] = {
 // ?
 static int cube_indices[] = {
     0, 1, 2, 3, 1, 5, 6, 2, 5, 4, 7, 6, 4, 0, 3, 7, 4, 5, 1, 0, 6, 7, 3, 2,
-};
-
-static SVECTOR tri_vertices[] = {
-    
 };
 
 static void init_cube(DB *db, CVECTOR *col) {
@@ -132,13 +128,13 @@ static void init_triangle(DB *db, CVECTOR *col) {
 }
 
 static void add_triangle(u_long *ot, POLY_F3 *s) {
-    s->x0 = SCREEWIDTH - 64;
+    s->x0 = SCREENWIDTH - 64;
     s->y0 = 64;
 
-    s->x1 = SCREEWIDTH - 64;
+    s->x1 = SCREENWIDTH - 64;
     s->y1 = TRIANGLESIZE+s->y0;
 
-    s->x2 = SCREEWIDTH - 64 - TRIANGLESIZE;
+    s->x2 = SCREENWIDTH - 64 - TRIANGLESIZE;
     s->y2 = abs(s->y1 - s->y0);
 
     size_t i;
@@ -174,10 +170,10 @@ int main(void) {
     SetGeomOffset(320, 240);
     SetGeomScreen(SCREEN_Z);
 
-    SetDefDrawEnv(&db[0].draw, 0, 0, 640, 480);
-    SetDefDrawEnv(&db[1].draw, 0, 0, 640, 480);
-    SetDefDispEnv(&db[0].disp, 0, 0, 640, 480);
-    SetDefDispEnv(&db[1].disp, 0, 0, 640, 480);
+    SetDefDrawEnv(&db[0].draw, 0, 0, SCREENWIDTH, SCREENHEIGHT);
+    SetDefDrawEnv(&db[1].draw, 0, 0, SCREENWIDTH, SCREENHEIGHT);
+    SetDefDispEnv(&db[0].disp, 0, 0, SCREENWIDTH, SCREENHEIGHT);
+    SetDefDispEnv(&db[1].disp, 0, 0, SCREENWIDTH, SCREENHEIGHT);
 
     srand(0);
 
