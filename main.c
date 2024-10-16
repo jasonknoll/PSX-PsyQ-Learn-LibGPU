@@ -7,7 +7,7 @@
 */
 
 
-/ Callback functions
+// Callback functions
 #include <libetc.h>
 
 // Graphics 
@@ -39,19 +39,24 @@ typedef struct DB {
     DRAWENV draw;
     DISPENV disp;
     u_long ot[OTSIZE];
-    POLY_F4 s[6];
+    POLY_F4 s[6]; // 6 squares to make a cube
+    POLY_F3 s_triangle; // TODO draw a triangle
 } DB;
 
 static SVECTOR cube_vertices[] = {
-    {-CUBESIZE / 2, -CUBESIZE / 2, -CUBESIZE / 2, 0}, {CUBESIZE / 2, -CUBESIZE / 2, -CUBESIZE / 2, 0},
-    {CUBESIZE / 2, CUBESIZE / 2, -CUBESIZE / 2, 0},   {-CUBESIZE / 2, CUBESIZE / 2, -CUBESIZE / 2, 0},
-    {-CUBESIZE / 2, -CUBESIZE / 2, CUBESIZE / 2, 0},  {CUBESIZE / 2, -CUBESIZE / 2, CUBESIZE / 2, 0},
-    {CUBESIZE / 2, CUBESIZE / 2, CUBESIZE / 2, 0},    {-CUBESIZE / 2, CUBESIZE / 2, CUBESIZE / 2, 0},
+    {-CUBESIZE / 2, -CUBESIZE / 2, -CUBESIZE / 2, 0}, {CUBESIZE / 2, -CUBESIZE / 2, -CUBESIZE / 2, 0}, // Side 1
+    {CUBESIZE / 2, CUBESIZE / 2, -CUBESIZE / 2, 0},   {-CUBESIZE / 2, CUBESIZE / 2, -CUBESIZE / 2, 0}, // 2 
+    {-CUBESIZE / 2, -CUBESIZE / 2, CUBESIZE / 2, 0},  {CUBESIZE / 2, -CUBESIZE / 2, CUBESIZE / 2, 0}, // 3 
+    {CUBESIZE / 2, CUBESIZE / 2, CUBESIZE / 2, 0},    {-CUBESIZE / 2, CUBESIZE / 2, CUBESIZE / 2, 0}, // 4
 };
 
+// ?
 static int cube_indices[] = {
     0, 1, 2, 3, 1, 5, 6, 2, 5, 4, 7, 6, 4, 0, 3, 7, 4, 5, 1, 0, 6, 7, 3, 2,
 };
+
+//static SVECTOR tri_vertices[] = {};
+//static int tri_indices[] = {};
 
 static void init_cube(DB *db, CVECTOR *col) {
     size_t i;
@@ -77,9 +82,14 @@ static void add_cube(u_long *ot, POLY_F4 *s, MATRIX *transform) {
 
         if (nclip <= 0) continue;
 
+        // Add primitive to the OT
         if ((otz > 0) && (otz < OTSIZE)) AddPrim(&ot[otz], s);
     }
 }
+
+static void init_triangle() {}
+
+static void add_triangle() {}
 
 int main(void) {
     DB db[2];
@@ -117,34 +127,45 @@ int main(void) {
     init_cube(&db[0], col);
     init_cube(&db[1], col);
 
+    // Draw display mask*
     SetDispMask(1);
 
+    // Set draw and disp environments to db[0]
     PutDrawEnv(&db[0].draw);
     PutDispEnv(&db[0].disp);
 
     while (1) {
+        // Double-buffer swapping
         cdb = (cdb == &db[0]) ? &db[1] : &db[0];
 
-        rotation.vy += 16;
-        rotation.vz += 16;
+        // Rotation speed
+        rotation.vy += 8;
+        rotation.vz += 4;
 
         RotMatrix(&rotation, &transform);
         TransMatrix(&transform, &translation);
 
         ClearOTagR(cdb->ot, OTSIZE);
 
+        // Adds text to print stream?
         FntPrint("Code compiled using Psy-Q libraries\n\n");
         FntPrint("converted by psyq-obj-parser\n\n");
         FntPrint("Trying to print out different shapes\n\n");
+        FntPrint("TODO -- Draw a Square");
 
+        // Add cube to the ordering table OT
         add_cube(cdb->ot, cdb->s, &transform);
 
+        // Wait for screen to sync before clearing and drawing
         DrawSync(0);
         VSync(0);
 
         ClearImage(&cdb->draw.clip, 60, 120, 120);
 
+        // Draws primitives in cdb->ot
         DrawOTag(&cdb->ot[OTSIZE - 1]);
+
+        // Draw the print stream
         FntFlush(-1);
     }
 
