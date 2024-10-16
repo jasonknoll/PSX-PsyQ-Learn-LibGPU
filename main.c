@@ -24,8 +24,12 @@
 
 // Standard C library
 #include <stdlib.h>
+#include <abs.h>
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(*(a)))
+
+#define SCREEWIDTH 640
+#define SCREENHEIGHT 480
 
 #define OTSIZE 4096
 #define SCREEN_Z 512
@@ -122,6 +126,33 @@ static void add_line(u_long *ot, LINE_F2 *l) {
     if (i > 0 && i < OTSIZE) AddPrim(&ot[i+1], l);
 }
 
+static void init_triangle(DB *db, CVECTOR *col) {
+    SetPolyF3(&db->s_triangle);
+    setRGB0(&db->s_triangle, col->r, col->g, col->b);
+}
+
+static void add_triangle(u_long *ot, POLY_F3 *s) {
+    s->x0 = SCREEWIDTH - 64;
+    s->y0 = 64;
+
+    s->x1 = SCREEWIDTH - 64;
+    s->y1 = TRIANGLESIZE+s->y0;
+
+    s->x2 = SCREEWIDTH - 64 - TRIANGLESIZE;
+    s->y2 = abs(s->y1 - s->y0);
+
+    size_t i;
+
+    for (i = 0; i < ARRAY_SIZE(ot); i++) {
+        if (ot[i] == NULL) {
+            break;
+        }
+    }
+
+    if (i > 0 && i < OTSIZE) AddPrim(&ot[i+1], s);
+
+}
+
 int main(void) {
     DB db[2];
     DB *cdb;
@@ -166,6 +197,9 @@ int main(void) {
     init_line(&db[0], &triangle_color);
     init_line(&db[1], &triangle_color);
 
+    init_triangle(&db[0], &triangle_color);
+    init_triangle(&db[1], &triangle_color);
+
     // Draw display mask*
     SetDispMask(1);
 
@@ -200,6 +234,8 @@ int main(void) {
 
         // LETS GO
         add_line(cdb->ot, &cdb->test_line);
+
+        add_triangle(cdb->ot, &cdb->s_triangle);
 
         // Wait for screen to sync before clearing and drawing
         DrawSync(0);
