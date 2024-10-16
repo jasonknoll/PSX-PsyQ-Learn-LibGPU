@@ -1,5 +1,5 @@
 /*
-    Learning the PSX GPU Library
+    Learning the PSX GPU & GTE Libraries
     main.c
     Jason Knoll
 
@@ -30,6 +30,8 @@
 #define OTSIZE 4096
 #define SCREEN_Z 512
 #define CUBESIZE 196
+#define TRIANGLESIZE 64
+#define LINELEN 64
 
 // Set RAM and Stack sizes to 2MB and 16KB respectivley
 unsigned long __ramsize = 0x00200000;
@@ -41,6 +43,7 @@ typedef struct DB {
     u_long ot[OTSIZE];
     POLY_F4 s[6]; // 6 squares to make a cube
     POLY_F3 s_triangle; // TODO draw a triangle
+    LINE_F2 test_line; // TODO draw a line
 } DB;
 
 static SVECTOR cube_vertices[] = {
@@ -55,8 +58,9 @@ static int cube_indices[] = {
     0, 1, 2, 3, 1, 5, 6, 2, 5, 4, 7, 6, 4, 0, 3, 7, 4, 5, 1, 0, 6, 7, 3, 2,
 };
 
-//static SVECTOR tri_vertices[] = {};
-//static int tri_indices[] = {};
+static SVECTOR tri_vertices[] = {
+    
+};
 
 static void init_cube(DB *db, CVECTOR *col) {
     size_t i;
@@ -87,9 +91,26 @@ static void add_cube(u_long *ot, POLY_F4 *s, MATRIX *transform) {
     }
 }
 
-static void init_triangle() {}
+static void init_line(DB *db, CVECTOR *col) {
+    SetLineF2(&db->test_line);
+    setRGB0(&db->test_line, col->r, col->g, col->b);
+}
 
-static void add_triangle() {}
+static void add_line(u_long *ot, LINE_F2 *l) {
+    short x0 = 10;
+    short y0 = 227;
+
+    short x1 = x0; // vertical line
+    short y1 = y0 + LINELEN;
+
+    l->x0 = x0;
+    l->y0 = y0;
+
+    l->x1 = x0;
+    l->y1 = y1;
+
+    AddPrim(&ot[200], l);
+}
 
 int main(void) {
     DB db[2];
@@ -98,6 +119,7 @@ int main(void) {
     VECTOR translation = {0, 0, (SCREEN_Z * 3) / 2, 0};
     MATRIX transform;
     CVECTOR col[6];
+    CVECTOR triangle_color;
     size_t i;
 
     ResetGraph(0);
@@ -127,6 +149,10 @@ int main(void) {
     init_cube(&db[0], col);
     init_cube(&db[1], col);
 
+
+    init_line(&db[0], &col[0]);
+    init_line(&db[1], &col[0]);
+
     // Draw display mask*
     SetDispMask(1);
 
@@ -134,7 +160,7 @@ int main(void) {
     PutDrawEnv(&db[0].draw);
     PutDispEnv(&db[0].disp);
 
-    while (1) {
+    for (;;) {
         // Double-buffer swapping
         cdb = (cdb == &db[0]) ? &db[1] : &db[0];
 
@@ -155,6 +181,8 @@ int main(void) {
 
         // Add cube to the ordering table OT
         add_cube(cdb->ot, cdb->s, &transform);
+
+        add_line(cdb->ot, &cdb->test_line);
 
         // Wait for screen to sync before clearing and drawing
         DrawSync(0);
