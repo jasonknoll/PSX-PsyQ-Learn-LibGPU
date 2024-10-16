@@ -109,7 +109,15 @@ static void add_line(u_long *ot, LINE_F2 *l) {
     l->x1 = x0;
     l->y1 = y1;
 
-    AddPrim(&ot[200], l);
+    size_t i;
+
+    for (i = 0; i < ARRAY_SIZE(ot); i++) {
+        if (ot[i] == NULL) {
+            break;
+        }
+    }
+
+    if (i > 0 && i < OTSIZE) AddPrim(&ot[i+1], l);
 }
 
 int main(void) {
@@ -182,6 +190,7 @@ int main(void) {
         // Add cube to the ordering table OT
         add_cube(cdb->ot, cdb->s, &transform);
 
+        // LETS GO
         add_line(cdb->ot, &cdb->test_line);
 
         // Wait for screen to sync before clearing and drawing
