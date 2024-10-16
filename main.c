@@ -41,9 +41,11 @@ typedef struct DB {
     DRAWENV draw;
     DISPENV disp;
     u_long ot[OTSIZE];
+    // NOTE How do I just use a pointer like the docs say? (ordtbl.pdf section 1.3)
+    //u_long *ot_2d; 
     POLY_F4 s[6]; // 6 squares to make a cube
     POLY_F3 s_triangle; // TODO draw a triangle
-    LINE_F2 test_line; // TODO draw a line
+    LINE_F2 test_line; 
 } DB;
 
 static SVECTOR cube_vertices[] = {
@@ -179,6 +181,9 @@ int main(void) {
         RotMatrix(&rotation, &transform);
         TransMatrix(&transform, &translation);
 
+        // ERROR doc says I can use a pointer instead of array
+        // for ordering table, but I don't know how to clear OT with it
+        //ClearOTagR(cdb->ot_2d, sizeof(cdb->ot_2d));
         ClearOTagR(cdb->ot, OTSIZE);
 
         // Adds text to print stream?
