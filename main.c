@@ -21,6 +21,7 @@
 
 // Controller
 #include <libpad.h>
+#include <libetc.h>
 
 // Standard C library
 #include <stdlib.h>
@@ -202,6 +203,14 @@ int main(void) {
     // Set draw and disp environments to db[0]
     PutDrawEnv(&db[0].draw);
     PutDispEnv(&db[0].disp);
+
+    // Controller shit
+    // TODO init controller
+    // TODO get controller input
+    // TODO move shapes based on input
+
+    PadInit(0); // NOTE says only used for prototyping
+    //PadInitDirect(.., ..);
 
     for (;;) {
         // Double-buffer swapping
